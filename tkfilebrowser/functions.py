@@ -105,6 +105,9 @@ def askopendirnames(parent=None, title=_("Open"), **kwargs):
         res = ()
     return res
 
+# Old interface aliases.
+askdirectory = askopendirname
+askdirectories = askopendirnames
 
 def askopenfilename(parent=None, title=_("Open"), **kwargs):
     """
