@@ -26,9 +26,8 @@ from re import search
 from subprocess import check_output
 from os import walk, mkdir, stat, access, W_OK, listdir
 from os import name as OSNAME
-from os.path import sep as SEP
-from os.path import exists, join, getmtime, realpath, split, expanduser, \
-    abspath, isabs, splitext, dirname, getsize, isdir, isfile, islink
+from os.path import exists, join, getmtime, split, expanduser, \
+    isabs, splitext, dirname, getsize, isdir, isfile, islink
 try:
     from os import scandir
     SCANDIR = True
@@ -42,6 +41,8 @@ from tkfilebrowser.autoscrollbar import AutoScrollbar
 from tkfilebrowser.path_button import PathButton
 from tkfilebrowser.tooltip import TooltipTreeWrapper
 from tkfilebrowser.recent_files import RecentFiles
+
+from pathlib import PurePath
 
 if OSNAME == 'nt':
     from win32com.shell import shell, shellcon
@@ -613,8 +614,8 @@ class FileBrowser(tk.Toplevel):
         sel = self.right_tree.selection()
         if sel:
             self.right_tree.selection_remove(*sel)
-        path = abspath(join(self.history[self._hist_index],
-                            self.paths_beginning_by[self.paths_beginning_by_index]))
+        path = join(self.history[self._hist_index],
+                    self.paths_beginning_by[self.paths_beginning_by_index])
         self.right_tree.see(path)
         self.right_tree.selection_add(path)
 
@@ -984,7 +985,7 @@ class FileBrowser(tk.Toplevel):
         if path == "/":
             folders = []
         else:
-            folders = path.split(SEP)
+            folders = PurePath(path).parts
             while '' in folders:
                 folders.remove('')
         if OSNAME == 'nt':
@@ -1012,8 +1013,6 @@ class FileBrowser(tk.Toplevel):
             * reset (boolean): forget all the part of the history right of self._hist_index
             * update_bar (boolean): update the buttons in path bar
         """
-        # remove trailing / if any
-        folder = abspath(folder)
         # reorganize display if previous was 'recent'
         if not self.path_bar.winfo_ismapped():
             self.path_bar.grid()
@@ -1105,8 +1104,6 @@ class FileBrowser(tk.Toplevel):
             * reset (boolean): forget all the part of the history right of self._hist_index
             * update_bar (boolean): update the buttons in path bar
         """
-        # remove trailing / if any
-        folder = abspath(folder)
         # reorganize display if previous was 'recent'
         if not self.path_bar.winfo_ismapped():
             self.path_bar.grid()
@@ -1208,8 +1205,6 @@ class FileBrowser(tk.Toplevel):
             * reset (boolean): forget all the part of the history right of self._hist_index
             * update_bar (boolean): update the buttons in path bar
         """
-        # remove trailing / if any
-        folder = abspath(folder)
         # reorganize display if previous was 'recent'
         if not self.path_bar.winfo_ismapped():
             self.path_bar.grid()
@@ -1427,7 +1422,7 @@ class FileBrowser(tk.Toplevel):
                     rep = False
 
             if rep:
-                self.result = realpath(path)
+                self.result = path
                 self.quit()
             elif rep is None:
                 self.quit()
@@ -1451,9 +1446,9 @@ class FileBrowser(tk.Toplevel):
             elif self.mode == "openfile":
                 if isfile(name):
                     if self.multiple_selection:
-                        self.result = (realpath(name),)
+                        self.result = (name,)
                     else:
-                        self.result = realpath(name)
+                        self.result = name
                     self.quit()
                 else:
                     self.display_folder(name)
@@ -1461,9 +1456,9 @@ class FileBrowser(tk.Toplevel):
                     self.entry.delete(0, "end")
             else:
                 if self.multiple_selection:
-                    self.result = (realpath(name),)
+                    self.result = (name,)
                 else:
-                    self.result = realpath(name)
+                    self.result = name
                 self.quit()
             return True
         else:
@@ -1474,9 +1469,9 @@ class FileBrowser(tk.Toplevel):
         sel = self.right_tree.selection()
         if self.mode == "opendir":
             if sel:
-                self.result = tuple(realpath(s) for s in sel)
+                self.result = tuple(s for s in sel)
             else:
-                self.result = (realpath(self.history[self._hist_index]),)
+                self.result = (self.history[self._hist_index],)
             self.quit()
         else:  # mode == openfile
             if len(sel) == 1:
@@ -1485,11 +1480,11 @@ class FileBrowser(tk.Toplevel):
                 if ("folder" in tags) or ("folder_link" in tags):
                     self.display_folder(sel)
                 else:
-                    self.result = (realpath(sel),)
+                    self.result = (sel,)
                     self.quit()
             elif len(sel) > 1:
                 files = tuple(s for s in sel if "file" in self.right_tree.item(s, "tags"))
-                files = files + tuple(realpath(s) for s in sel if "file_link" in self.right_tree.item(s, "tags"))
+                files = files + tuple(s for s in sel if "file_link" in self.right_tree.item(s, "tags"))
                 if files:
                     self.result = files
                     self.quit()
@@ -1506,13 +1501,13 @@ class FileBrowser(tk.Toplevel):
                 if ("folder" in tags) or ("folder_link" in tags):
                     self.display_folder(sel)
                 else:
-                    self.result = realpath(sel)
+                    self.result = sel
                     self.quit()
         else:  # mode is "opendir"
             if len(sel) == 1:
-                self.result = realpath(sel[0])
+                self.result = sel[0]
             else:
-                self.result = realpath(self.history[self._hist_index])
+                self.result = self.history[self._hist_index]
             self.quit()
 
     def validate(self, event=None):
