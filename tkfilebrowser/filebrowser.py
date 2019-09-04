@@ -333,20 +333,31 @@ class FileBrowser(tk.Toplevel):
         wrapper.add_tooltip("recent", _("Recently used"))
 
         # -------- devices
-        devices = psutil.disk_partitions(all=True if OSNAME == "nt" else False)
+        if OSNAME == 'nt':
+            devices = psutil.disk_partitions(all=True if OSNAME == "nt" else False)
 
-        for d in devices:
-            m = d.mountpoint
-            if m == "/":
-                txt = "/"
-            else:
-                if OSNAME == 'nt':
-                    txt = m
+            for d in devices:
+                m = d.mountpoint
+                if m == "/":
+                    txt = "/"
                 else:
-                    txt = split(m)[-1]
-            self.left_tree.insert("", "end", iid=m, text=txt,
+                    if OSNAME == 'nt':
+                        txt = m
+                    else:
+                        txt = split(m)[-1]
+                self.left_tree.insert("", "end", iid=m, text=txt,
+                                      image=self.im_drive)
+                wrapper.add_tooltip(m, m)
+        elif OSNAME == 'posix':
+            self.left_tree.insert("", "end", iid="/", text="/",
                                   image=self.im_drive)
-            wrapper.add_tooltip(m, m)
+
+            media = expanduser("~").replace("home", "media", 1)
+            medias = listdir(media)
+            for m in medias:
+                self.left_tree.insert("", "end", iid=join(media, m), text=m,
+                                      image=self.im_drive)
+                wrapper.add_tooltip(m, m)
 
         # -------- home
         home = expanduser("~")
