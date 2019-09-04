@@ -132,8 +132,11 @@ Documentation
 Changelog
 ---------
 
+- Changes below made by gbMichelle:
+
 - tkfilebrowser 2.4.0
     * Make returned paths not absolute.
+    * added aliases askdirectory & askdirectories for functions askopendirname & askopendirnames
 
 - Changes below were made by the original author Juliette Monsel:
 
