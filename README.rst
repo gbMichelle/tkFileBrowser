@@ -136,7 +136,8 @@ Changelog
 
 - tkfilebrowser 2.4.0
     * Make returned paths not absolute.
-    * added aliases askdirectory & askdirectories for functions askopendirname & askopendirnames
+    * Added aliases askdirectory & askdirectories for functions askopendirname & askopendirnames.
+    * Made it so that only / and user mounts get displayed on linux.
 
 - Changes below were made by the original author Juliette Monsel:
 
