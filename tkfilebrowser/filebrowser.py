@@ -138,6 +138,8 @@ class FileBrowser(tk.Toplevel):
         self.grab_set()
         self.protocol("WM_DELETE_WINDOW", self.quit)
         self.title(title)
+        self.minsize(600,400)
+        self.geometry("640x480")
 
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
@@ -1035,7 +1037,7 @@ class FileBrowser(tk.Toplevel):
             self.right_tree.configure(displaycolumns=("size", "date"))
             w = self.right_tree.winfo_width() - 205
             if w < 0:
-                w = 250
+                w = 400
             self.right_tree.column("#0", width=w)
             self.right_tree.column("size", stretch=False, width=85)
             self.right_tree.column("date", width=120)
