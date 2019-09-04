@@ -139,7 +139,6 @@ class FileBrowser(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.quit)
         self.title(title)
         self.minsize(600,400)
-        self.geometry("640x480")
 
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
