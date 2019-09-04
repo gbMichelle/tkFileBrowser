@@ -27,10 +27,10 @@ from tkfilebrowser.filebrowser import FileBrowser
 
 def askopendirname(parent=None, title=_("Open"), **kwargs):
     """
-    Return :obj:`''` or the absolute path of the chosen directory.
+    Return :obj:`''` or the path of the chosen directory.
 
     Arguments:
-    
+
         parent : Tk or Toplevel instance
             parent window
 
@@ -66,10 +66,10 @@ def askopendirname(parent=None, title=_("Open"), **kwargs):
 
 def askopendirnames(parent=None, title=_("Open"), **kwargs):
     """
-    Return :obj:`()` or the tuple of the absolute paths of the chosen directories
+    Return :obj:`()` or the tuple of the paths of the chosen directories
 
     Arguments:
-    
+
         parent : Tk or Toplevel instance
             parent window
 
@@ -108,10 +108,10 @@ def askopendirnames(parent=None, title=_("Open"), **kwargs):
 
 def askopenfilename(parent=None, title=_("Open"), **kwargs):
     """
-    Return :obj:`''` or the absolute path of the chosen file
+    Return :obj:`''` or the path of the chosen file
 
     Arguments:
-    
+
         parent : Tk or Toplevel instance
             parent window
 
@@ -147,10 +147,10 @@ def askopenfilename(parent=None, title=_("Open"), **kwargs):
 
 def askopenfilenames(parent=None, title=_("Open"), **kwargs):
     """
-    Return :obj:`()` or the tuple of the absolute paths of the chosen files
+    Return :obj:`()` or the tuple of the paths of the chosen files
 
     Arguments:
-    
+
         parent : Tk or Toplevel instance
             parent window
 
@@ -189,10 +189,10 @@ def askopenfilenames(parent=None, title=_("Open"), **kwargs):
 
 def asksaveasfilename(parent=None, title=_("Save As"), **kwargs):
     """
-    Return :obj:`''` or the chosen absolute path (the file might not exist)
-    
+    Return :obj:`''` or the chosen path (the file might not exist)
+
     Arguments:
-    
+
         parent : Tk or Toplevel instance
             parent window
 
@@ -204,9 +204,9 @@ def asksaveasfilename(parent=None, title=_("Save As"), **kwargs):
 
         initialfile : str
             initially selected item (just the name, not the full path)
-            
+
         defaultext : str (e.g. '.png')
-            extension added to filename if none is given (default is none)  
+            extension added to filename if none is given (default is none)
 
         filetypes : list :obj:`[("name", "*.ext1|*.ext2|.."), ...]`
           only the files of given filetype will be displayed,
