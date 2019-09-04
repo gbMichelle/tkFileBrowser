@@ -3,6 +3,11 @@
 tkfilebrowser - Alternative to filedialog for Tkinter
 Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
 
+Copyright 2019 gbMichelle
+    (09-2019)
+    * added aliases askdirectory & askdirectories
+      for functions askopendirname & askopendirnames
+
 tkfilebrowser is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
