@@ -138,6 +138,7 @@ Changelog
     * Make returned paths not absolute.
     * Added aliases askdirectory & askdirectories for functions askopendirname & askopendirnames.
     * Made it so that only / and user mounts get displayed on linux.
+    * Set minimum window size to 600x400 instead of it having no minimum.
 
 - Changes below were made by the original author Juliette Monsel:
 
