@@ -1,3 +1,5 @@
+This version of tkfilebrowser does not make paths absolute, this is a requirement for another project I am working on. Once that project has a better solution for this this fork won't update anymore. Feel free to use it, but beware.
+
 tkfilebrowser
 =============
 
