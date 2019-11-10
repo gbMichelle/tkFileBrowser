@@ -98,25 +98,25 @@ Documentation
 
 * askopendirname
 
-    Allow the user to choose a single directory. The absolute path of the
+    Allow the user to choose a single directory. The path of the
     chosen directory is returned. If the user cancels, an empty string is
     returned.
 
 * askopendirnames
 
-    Allow the user to choose multiple directories. A tuple containing the absolute
+    Allow the user to choose multiple directories. A tuple containing the
     path of the chosen directories is returned. If the user cancels,
     an empty tuple is returned.
 
 * askopenfilename
 
-    Allow the user to choose a single file. The absolute path of the
+    Allow the user to choose a single file. The path of the
     chosen file is returned. If the user cancels, an empty string is
     returned.
 
 * askopenfilenames
 
-    Allow the user to choose multiple files. A tuple containing the absolute
+    Allow the user to choose multiple files. A tuple containing the
     path of the chosen files is returned. If the user cancels,
     an empty tuple is returned.
 
@@ -133,6 +133,16 @@ Documentation
 
 Changelog
 ---------
+
+- Changes below made by gbMichelle:
+
+- tkfilebrowser 2.4.0
+    * Make returned paths not absolute.
+    * Added aliases askdirectory & askdirectories for functions askopendirname & askopendirnames.
+    * Made it so that only / and user mounts get displayed on linux.
+    * Set minimum window size to 600x400 instead of it having no minimum.
+
+- Changes below were made by the original author Juliette Monsel:
 
 - tkfilebrowser 2.3.2
     * Show networked drives on Windows

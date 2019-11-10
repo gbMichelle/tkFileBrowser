@@ -3,6 +3,11 @@
 tkfilebrowser - Alternative to filedialog for Tkinter
 Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
 
+Copyright 2019 gbMichelle
+    (09-2019)
+    * added aliases askdirectory & askdirectories
+      for functions askopendirname & askopendirnames
+
 tkfilebrowser is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -26,9 +31,8 @@ from re import search
 from subprocess import check_output
 from os import walk, mkdir, stat, access, W_OK, listdir
 from os import name as OSNAME
-from os.path import sep as SEP
-from os.path import exists, join, getmtime, realpath, split, expanduser, \
-    abspath, isabs, splitext, dirname, getsize, isdir, isfile, islink
+from os.path import exists, join, getmtime, split, expanduser, \
+    isabs, splitext, dirname, getsize, isdir, isfile, islink
 try:
     from os import scandir
     SCANDIR = True
@@ -42,6 +46,8 @@ from tkfilebrowser.autoscrollbar import AutoScrollbar
 from tkfilebrowser.path_button import PathButton
 from tkfilebrowser.tooltip import TooltipTreeWrapper
 from tkfilebrowser.recent_files import RecentFiles
+
+from pathlib import PurePath
 
 if OSNAME == 'nt':
     from win32com.shell import shell, shellcon
@@ -132,6 +138,7 @@ class FileBrowser(tk.Toplevel):
         self.grab_set()
         self.protocol("WM_DELETE_WINDOW", self.quit)
         self.title(title)
+        self.minsize(600,400)
 
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
@@ -327,20 +334,31 @@ class FileBrowser(tk.Toplevel):
         wrapper.add_tooltip("recent", _("Recently used"))
 
         # -------- devices
-        devices = psutil.disk_partitions(all=True if OSNAME == "nt" else False)
+        if OSNAME == 'nt':
+            devices = psutil.disk_partitions(all=True if OSNAME == "nt" else False)
 
-        for d in devices:
-            m = d.mountpoint
-            if m == "/":
-                txt = "/"
-            else:
-                if OSNAME == 'nt':
-                    txt = m
+            for d in devices:
+                m = d.mountpoint
+                if m == "/":
+                    txt = "/"
                 else:
-                    txt = split(m)[-1]
-            self.left_tree.insert("", "end", iid=m, text=txt,
+                    if OSNAME == 'nt':
+                        txt = m
+                    else:
+                        txt = split(m)[-1]
+                self.left_tree.insert("", "end", iid=m, text=txt,
+                                      image=self.im_drive)
+                wrapper.add_tooltip(m, m)
+        elif OSNAME == 'posix':
+            self.left_tree.insert("", "end", iid="/", text="/",
                                   image=self.im_drive)
-            wrapper.add_tooltip(m, m)
+
+            media = expanduser("~").replace("home", "media", 1)
+            medias = listdir(media)
+            for m in medias:
+                self.left_tree.insert("", "end", iid=join(media, m), text=m,
+                                      image=self.im_drive)
+                wrapper.add_tooltip(m, m)
 
         # -------- home
         home = expanduser("~")
@@ -613,8 +631,8 @@ class FileBrowser(tk.Toplevel):
         sel = self.right_tree.selection()
         if sel:
             self.right_tree.selection_remove(*sel)
-        path = abspath(join(self.history[self._hist_index],
-                            self.paths_beginning_by[self.paths_beginning_by_index]))
+        path = join(self.history[self._hist_index],
+                    self.paths_beginning_by[self.paths_beginning_by_index])
         self.right_tree.see(path)
         self.right_tree.selection_add(path)
 
@@ -984,7 +1002,7 @@ class FileBrowser(tk.Toplevel):
         if path == "/":
             folders = []
         else:
-            folders = path.split(SEP)
+            folders = PurePath(path).parts
             while '' in folders:
                 folders.remove('')
         if OSNAME == 'nt':
@@ -1012,15 +1030,13 @@ class FileBrowser(tk.Toplevel):
             * reset (boolean): forget all the part of the history right of self._hist_index
             * update_bar (boolean): update the buttons in path bar
         """
-        # remove trailing / if any
-        folder = abspath(folder)
         # reorganize display if previous was 'recent'
         if not self.path_bar.winfo_ismapped():
             self.path_bar.grid()
             self.right_tree.configure(displaycolumns=("size", "date"))
             w = self.right_tree.winfo_width() - 205
             if w < 0:
-                w = 250
+                w = 400
             self.right_tree.column("#0", width=w)
             self.right_tree.column("size", stretch=False, width=85)
             self.right_tree.column("date", width=120)
@@ -1105,8 +1121,6 @@ class FileBrowser(tk.Toplevel):
             * reset (boolean): forget all the part of the history right of self._hist_index
             * update_bar (boolean): update the buttons in path bar
         """
-        # remove trailing / if any
-        folder = abspath(folder)
         # reorganize display if previous was 'recent'
         if not self.path_bar.winfo_ismapped():
             self.path_bar.grid()
@@ -1208,8 +1222,6 @@ class FileBrowser(tk.Toplevel):
             * reset (boolean): forget all the part of the history right of self._hist_index
             * update_bar (boolean): update the buttons in path bar
         """
-        # remove trailing / if any
-        folder = abspath(folder)
         # reorganize display if previous was 'recent'
         if not self.path_bar.winfo_ismapped():
             self.path_bar.grid()
@@ -1427,7 +1439,7 @@ class FileBrowser(tk.Toplevel):
                     rep = False
 
             if rep:
-                self.result = realpath(path)
+                self.result = path
                 self.quit()
             elif rep is None:
                 self.quit()
@@ -1451,9 +1463,9 @@ class FileBrowser(tk.Toplevel):
             elif self.mode == "openfile":
                 if isfile(name):
                     if self.multiple_selection:
-                        self.result = (realpath(name),)
+                        self.result = (name,)
                     else:
-                        self.result = realpath(name)
+                        self.result = name
                     self.quit()
                 else:
                     self.display_folder(name)
@@ -1461,9 +1473,9 @@ class FileBrowser(tk.Toplevel):
                     self.entry.delete(0, "end")
             else:
                 if self.multiple_selection:
-                    self.result = (realpath(name),)
+                    self.result = (name,)
                 else:
-                    self.result = realpath(name)
+                    self.result = name
                 self.quit()
             return True
         else:
@@ -1474,9 +1486,9 @@ class FileBrowser(tk.Toplevel):
         sel = self.right_tree.selection()
         if self.mode == "opendir":
             if sel:
-                self.result = tuple(realpath(s) for s in sel)
+                self.result = tuple(s for s in sel)
             else:
-                self.result = (realpath(self.history[self._hist_index]),)
+                self.result = (self.history[self._hist_index],)
             self.quit()
         else:  # mode == openfile
             if len(sel) == 1:
@@ -1485,11 +1497,11 @@ class FileBrowser(tk.Toplevel):
                 if ("folder" in tags) or ("folder_link" in tags):
                     self.display_folder(sel)
                 else:
-                    self.result = (realpath(sel),)
+                    self.result = (sel,)
                     self.quit()
             elif len(sel) > 1:
                 files = tuple(s for s in sel if "file" in self.right_tree.item(s, "tags"))
-                files = files + tuple(realpath(s) for s in sel if "file_link" in self.right_tree.item(s, "tags"))
+                files = files + tuple(s for s in sel if "file_link" in self.right_tree.item(s, "tags"))
                 if files:
                     self.result = files
                     self.quit()
@@ -1506,13 +1518,13 @@ class FileBrowser(tk.Toplevel):
                 if ("folder" in tags) or ("folder_link" in tags):
                     self.display_folder(sel)
                 else:
-                    self.result = realpath(sel)
+                    self.result = sel
                     self.quit()
         else:  # mode is "opendir"
             if len(sel) == 1:
-                self.result = realpath(sel[0])
+                self.result = sel[0]
             else:
-                self.result = realpath(self.history[self._hist_index])
+                self.result = self.history[self._hist_index]
             self.quit()
 
     def validate(self, event=None):
